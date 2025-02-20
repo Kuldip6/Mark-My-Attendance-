@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance B.Pharma 4th Semester (Batch 2023-2027)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    h2 { margin-bottom: 10px; }
+    table {
+      width: 90%;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 6px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th { background-color: #f2f2f2; }
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      accent-color: #388E3C;
+    }
+    input[type="text"] {
+      padding: 6px;
+      font-size: 14px;
+      width: 300px;
+      margin: 10px 0;
+    }
+    #summary-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    .summary-box {
+      padding: 10px 20px;
+      border: 1px solid #000;
+      background: #f2f2f2;
+      margin: 0 5px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .action-buttons {
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background: #45a049; }
+    @media print {
+      .action-buttons, #subjectInputContainer { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <h2>Attendance - B.Pharma 4th Semester (Batch 2023-2027)</h2>
+  <p>Date: <span id="currentDate"></span></p>
+  <div id="subjectInputContainer">
+    <label for="subjectName">Subject Name:</label>
+    <input type="text" id="subjectName" placeholder="Enter subject name" />
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Sl. No.</th>
+        <th>Enrollment No.</th>
+        <th>Student Name</th>
+        <th>Present</th>
+      </tr>
+    </thead>
+    <tbody id="studentTable"></tbody>
+  </table>
+  <div id="summary-container">
+    <div class="summary-box">Total: <span id="totalCount">92</span></div>
+    <div class="summary-box">Present: <span id="presentCount">0</span></div>
+    <div class="summary-box">Absent: <span id="absentCount">92</span></div>
+  </div>
+  
+  <div class="action-buttons">
+    <button id="printButton">Print Attendance</button>
+    <button id="pdfShareButton">Save as PDF &amp; Share</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <script>
+    const currentDateElem = document.getElementById("currentDate");
+    const today = new Date();
+    currentDateElem.textContent = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth()+1).padStart(2, '0')}-${today.getFullYear()}`;
+
+    const students = [
+      { no: 1, enrollment: "AJU/230001", name: "BIKRAM KISHORE PANDA" },
+      { no: 2, enrollment: "AJU/230003", name: "SAHIL PATI" },
+      { no: 3, enrollment: "AJU/230005", name: "SUBODH KUMAR YADAV" },
+      { no: 4, enrollment: "AJU/230007", name: "ANANT KUMAR" },
+      { no: 5, enrollment: "AJU/230009", name: "SHIKHA KUMARI" },
+      { no: 6, enrollment: "AJU/230011", name: "SWATI MAHATO" },
+      { no: 7, enrollment: "AJU/230014", name: "UDHRAV MANDAL" },
+      { no: 8, enrollment: "AJU/230016", name: "AASTHA SINGH" },
+      { no: 9, enrollment: "AJU/230019", name: "RISHAV KUMAR CHOURASIA" },
+      { no: 10, enrollment: "AJU/230025", name: "BITTU RAJA MANDAL" },
+      { no: 11, enrollment: "AJU/230026", name: "BOBBY THAPA" },
+      { no: 12, enrollment: "AJU/230028", name: "ABHISHEK MAHTO" },
+      { no: 13, enrollment: "AJU/230032", name: "ROHIT KUMAR" },
+      { no: 14, enrollment: "AJU/230035", name: "ANISH CHOUHAN" },
+      { no: 15, enrollment: "AJU/230045", name: "ANAMIKA KUMARI" },
+      { no: 16, enrollment: "AJU/230048", name: "RAHUL KUMAR" },
+      { no: 17, enrollment: "AJU/230067", name: "SOURISH NANDA" },
+      { no: 18, enrollment: "AJU/230079", name: "DEEPAK ANAND" },
+      { no: 19, enrollment: "AJU/230090", name: "HABIBA FATMA" },
+      { no: 20, enrollment: "AJU/230133", name: "CHANDAN RAY" },
+      { no: 21, enrollment: "AJU/230136", name: "SWETA KUMARI" },
+      { no: 22, enrollment: "AJU/230137", name: "ASAD PARWEZ" },
+      { no: 23, enrollment: "AJU/230138", name: "TABISH RAJA" },
+      { no: 24, enrollment: "AJU/230139", name: "WAIS JAMSHED" },
+      { no: 25, enrollment: "AJU/230146", name: "VIVEK KUMAR MAHATO" },
+      { no: 26, enrollment: "AJU/230151", name: "ARCHANA KUMARI" },
+      { no: 27, enrollment: "AJU/230160", name: "KHUSHI KUMARI" },
+      { no: 28, enrollment: "AJU/230162", name: "ADITYA KUMAR" },
+      { no: 29, enrollment: "AJU/230174", name: "BIKAS KUMAR BALA" },
+      { no: 30, enrollment: "AJU/230177", name: "MD ABUTAHA" },
+      { no: 31, enrollment: "AJU/230179", name: "DHIRAJ KUMAR DAS" },
+      { no: 32, enrollment: "AJU/230203", name: "ADITYA KUMAR" },
+      { no: 33, enrollment: "AJU/230207", name: "VIVEK RAJ" },
+      { no: 34, enrollment: "AJU/230210", name: "AJIT KUMAR" },
+      { no: 35, enrollment: "AJU/230211", name: "MONU KUMAR" },
+      { no: 36, enrollment: "AJU/230223", name: "PRIYANSHI PANDEY" },
+      { no: 37, enrollment: "AJU/230230", name: "SUMIT KUMAR MISHRA" },
+      { no: 38, enrollment: "AJU/230244", name: "MRITUNJAY KUMAR" },
+      { no: 39, enrollment: "AJU/230252", name: "PRATIK SHARMA" },
+      { no: 40, enrollment: "AJU/230263", name: "ANISH KUMAR YADAV" },
+      { no: 41, enrollment: "AJU/230280", name: "SHOAIB AKHTAR" },
+      { no: 42, enrollment: "AJU/230287", name: "SRITI PAUL" },
+      { no: 43, enrollment: "AJU/230311", name: "ISHA SHARMA" },
+      { no: 44, enrollment: "AJU/230333", name: "ADITYA KUMAR SHARMA" },
+      { no: 45, enrollment: "AJU/230344", name: "ALIYA GHAZAL" },
+      { no: 46, enrollment: "AJU/230398", name: "MADHAV KUMAR" },
+      { no: 47, enrollment: "AJU/230410", name: "PRIYA KUMARI" },
+      { no: 48, enrollment: "AJU/230420", name: "RAJ KUMAR YADAV" },
+      { no: 49, enrollment: "AJU/230434", name: "ANAMIKA KUMARI" },
+      { no: 50, enrollment: "AJU/230471", name: "HARI PRIYA PANDA" },
+      { no: 51, enrollment: "AJU/230476", name: "ANISHA SHARMA" },
+      { no: 52, enrollment: "AJU/230495", name: "APPU MAHATO" },
+      { no: 53, enrollment: "AJU/230502", name: "MD WASIM ANSARI" },
+      { no: 54, enrollment: "AJU/230527", name: "NANDANI KUMARI PANDEY" },
+      { no: 55, enrollment: "AJU/230545", name: "BAIJNATH KUMAR SAHANI" },
+      { no: 56, enrollment: "AJU/230550", name: "ROHIT RAJ" },
+      { no: 57, enrollment: "AJU/230558", name: "PRIYANKA KUMARI" },
+      { no: 58, enrollment: "AJU/230563", name: "KHUSHI SHARMA" },
+      { no: 59, enrollment: "AJU/230565", name: "RAMANAND KUMAR" },
+      { no: 60, enrollment: "AJU/230567", name: "NAVEEN MARDI" },
+      { no: 61, enrollment: "AJU/230598", name: "ANUPAMA GORAI" },
+      { no: 62, enrollment: "AJU/230642", name: "CHAMPA KUMARI" },
+      { no: 63, enrollment: "AJU/230645", name: "KULDIP MAHTO" },
+      { no: 64, enrollment: "AJU/230670", name: "DHARMENDRA KUMAR MAHTO" },
+      { no: 65, enrollment: "AJU/230680", name: "ASHISH YADAV" },
+      { no: 66, enrollment: "AJU/230685", name: "SURAJ KUMAR CHOUDHARY" },
+      { no: 67, enrollment: "AJU/230701", name: "MOHAMMAD SABA UDDIN" },
+      { no: 68, enrollment: "AJU/230704", name: "ANIMESH KUMAR BHAKAT" },
+      { no: 69, enrollment: "AJU/230712", name: "ANJALI KUMARI" },
+      { no: 70, enrollment: "AJU/230758", name: "AMAN KUMAR" },
+      { no: 71, enrollment: "AJU/230783", name: "ADARSH KUMAR" },
+      { no: 72, enrollment: "AJU/230790", name: "AVISHEK KUMAR OJHA" },
+      { no: 73, enrollment: "AJU/230795", name: "KASHISH KUMARI" },
+      { no: 74, enrollment: "AJU/230807", name: "ASHUTOSH RANJAN" },
+      { no: 75, enrollment: "AJU/230925", name: "MD FIROZ" },
+      { no: 76, enrollment: "AJU/231013", name: "SAHIL CHOUDHARY" },
+      { no: 77, enrollment: "AJU/231034", name: "IQRA AHMAD" },
+      { no: 78, enrollment: "AJU/231248", name: "NISHANT KUMAR" },
+      { no: 79, enrollment: "AJU/231363", name: "RAHUL KUMAR" },
+      { no: 80, enrollment: "AJU/231391", name: "MEGHA JOSHI" },
+      { no: 81, enrollment: "AJU/231636", name: "SHRISTI YADAV" },
+      { no: 82, enrollment: "AJU/231647", name: "AKRITI SINHA" },
+      { no: 83, enrollment: "AJU/231650", name: "RISHAV KUMAR GUPTA" },
+      { no: 84, enrollment: "AJU/231653", name: "SUNIDHI SUMAN" },
+      { no: 85, enrollment: "AJU/231662", name: "SACHIN NARAYAN DEO" },
+      { no: 86, enrollment: "AJU/231753", name: "JATIN KUMAR MAHTO" },
+      { no: 87, enrollment: "AJU/231758", name: "GAURAV BHATTACHARJEE" },
+      { no: 88, enrollment: "AJU/232066", name: "RAUNAK KUMAR" },
+      { no: 89, enrollment: "AJU/232182", name: "JAY PRAKASH MAHTO" },
+      { no: 90, enrollment: "AJU/232183", name: "DILIP KUMAR MAHTO" },
+      { no: 91, enrollment: "AJU/232323", name: "PRADYUMNA DAS" },
+      { no: 92, enrollment: "AJU/232328", name: "PRATIMA KUMARI" }
+    ];
+    
+    const studentTable = document.getElementById("studentTable");
+    students.forEach(s => {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${s.no}</td>
+                       <td>${s.enrollment}</td>
+                       <td>${s.name}</td>
+                       <td><input type="checkbox" class="attendance-checkbox"></td>`;
+      studentTable.appendChild(row);
+    });
+    
+    function updateAttendance() {
+      const present = document.querySelectorAll('.attendance-checkbox:checked').length;
+      document.getElementById("presentCount").textContent = present;
+      document.getElementById("absentCount").textContent = students.length - present;
+    }
+    document.querySelectorAll('.attendance-checkbox').forEach(cb => {
+      cb.addEventListener('change', updateAttendance);
+    });
+    
+    function printAttendance() {
+      const subject = document.getElementById("subjectName").value || "N/A";
+      let rowsHTML = "";
+      studentTable.querySelectorAll("tr").forEach(row => {
+        const cb = row.querySelector(".attendance-checkbox");
+        if (cb) {
+          const rowHTML = row.innerHTML.replace(/<input([^>]+)>/, (match, group1) => {
+            return cb.checked ? '<input' + group1 + ' checked>' : '<input' + group1 + '>';
+          });
+          rowsHTML += `<tr style="page-break-inside: avoid;">${rowHTML}</tr>`;
+        }
+      });
+      
+      const printStyles = `
+        <style>
+          body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+          table { width: 90%; margin: 0 auto; border-collapse: collapse; }
+          th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 14px; }
+          th { background-color: #f2f2f2; }
+          .summary-box { padding: 10px 20px; border: 1px solid #000; background: #f2f2f2; margin: 0 5px; font-size: 16px; font-weight: bold; }
+          #summary-container { margin-top: 15px; }
+          input[type="checkbox"] { transform: scale(1.2); accent-color: #388E3C; }
+          thead { display: table-header-group; }
+        </style>
+      `;
+      
+      const printHTML = `
+        <html>
+          <head>
+            <title>Attendance Report</title>
+            ${printStyles}
+          </head>
+          <body>
+            <h2>Attendance Report - All Students</h2>
+            <p>Date: ${currentDateElem.textContent}</p>
+            <p>Subject Name: ${subject}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Sl. No.</th>
+                  <th>Enrollment No.</th>
+                  <th>Student Name</th>
+                  <th>Present</th>
+                </tr>
+              </thead>
+              <tbody>${rowsHTML}</tbody>
+            </table>
+            <div id="summary-container">
+              <div class="summary-box">Total: ${students.length}</div>
+              <div class="summary-box">Present: ${document.getElementById("presentCount").textContent}</div>
+              <div class="summary-box">Absent: ${document.getElementById("absentCount").textContent}</div>
+            </div>
+          </body>
+        </html>
+      `;
+      
+      const printWindow = window.open('', '_blank', 'height=600,width=800');
+      printWindow.document.write(printHTML);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.onload = () => printWindow.print();
+    }
+    document.getElementById("printButton").addEventListener("click", printAttendance);
+    
+    function saveAndSharePDF() {
+      const subject = document.getElementById("subjectName").value || "N/A";
+      
+      let rowsHTML = "";
+      document.querySelectorAll('#studentTable tr').forEach(row => {
+        const cb = row.querySelector('.attendance-checkbox');
+        if (cb) {
+          const cells = row.querySelectorAll('td');
+          const slNo = cells[0].textContent;
+          const enrollment = cells[1].textContent;
+          const studentName = cells[2].textContent;
+          const presentMark = cb.checked ? '<span style="color: green; font-size: 18px;">&#10004;</span>' : '';
+          rowsHTML += `<tr style="page-break-inside: avoid;">
+                         <td>${slNo}</td>
+                         <td>${enrollment}</td>
+                         <td>${studentName}</td>
+                         <td>${presentMark}</td>
+                       </tr>`;
+        }
+      });
+      
+      const totalStudents = students.length;
+      const presentCount = document.getElementById("presentCount").textContent;
+      const absentCount = document.getElementById("absentCount").textContent;
+      const summaryTable = `
+        <table>
+          <thead>
+            <tr>
+              <th>Total</th>
+              <th>Present</th>
+              <th>Absent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="page-break-inside: avoid;">
+              <td>${totalStudents}</td>
+              <td>${presentCount}</td>
+              <td>${absentCount}</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+      
+      const pdfStyles = `
+        <style>
+          body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+          }
+          h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 22px;
+            letter-spacing: 1px;
+          }
+          p {
+            text-align: center;
+            margin: 5px 0;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: 1px solid #000;
+          }
+          th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+          }
+          th {
+            background-color: cyan;
+            color: #000;
+            font-weight: normal;
+            font-size: 14px;
+          }
+          tr { page-break-inside: avoid; }
+          thead { display: table-header-group; }
+        </style>
+      `;
+      
+      const pdfHTML = `
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Attendance Report B-Pharma 4th Semester (Batch 2023-2027)</title>
+            ${pdfStyles}
+          </head>
+          <body>
+            <h2>Attendance Report B-Pharma 4th Semester (Batch 2023-2027)</h2>
+            <p>Date: ${currentDateElem.textContent}</p>
+            <p>Subject Name: ${subject}</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Sl. No.</th>
+                  <th>Enrollment No.</th>
+                  <th>Student Name</th>
+                  <th>Present</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHTML}
+              </tbody>
+            </table>
+            ${summaryTable}
+          </body>
+        </html>
+      `;
+      
+      const tempElement = document.createElement('div');
+      tempElement.innerHTML = pdfHTML;
+      document.body.appendChild(tempElement);
+      
+      const formattedDate = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth()+1).padStart(2, '0')}-${today.getFullYear().toString().slice(-2)}`;
+      const opt = {
+        margin: 0.5,
+        filename: `attendance_${formattedDate}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      
+      html2pdf().set(opt).from(tempElement).outputPdf('blob').then(function(pdfBlob) {
+        const file = new File([pdfBlob], `attendance_${formattedDate}.pdf`, { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({
+            title: 'Attendance Report B-Pharma 4th Semester (Batch 2023-2027)',
+            text: 'Check out the Attendance Report for B-Pharma 4th Semester (Batch 2023-2027)!',
+            files: [file]
+          })
+          .then(() => console.log('Shared successfully'))
+          .catch((error) => console.error('Error sharing:', error));
+        } else {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(pdfBlob);
+          a.download = `attendance_${formattedDate}.pdf`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+          alert('Share API not supported. PDF downloaded instead.');
+        }
+        document.body.removeChild(tempElement);
+      });
+    }
+    document.getElementById("pdfShareButton").addEventListener("click", saveAndSharePDF);
+  </script>
+</body>
+</html>
